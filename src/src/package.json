@@ -8,7 +8,7 @@
     "build": "tsc && vite build",
     "preview": "vite preview"
   },
-  "dependencies": {
+  "dependencies": {is
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
   },
