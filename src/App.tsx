@@ -6,7 +6,7 @@ export default function App() {
   const [position, setPosition] = useState("");
   const [foods, setFoods] = useState<string[]>([]);
   const [input, setInput] = useState("");
-  const [scanning, setScanning] = useState(false);
+  const [scanActive, setScanActive] = useState(false);
 
   useEffect(() => {
     const last = localStorage.getItem("lastReset");
@@ -36,136 +36,203 @@ export default function App() {
   }
 
   return (
-    <div style={styles.container}>
-      <h1>🏈 D1 Athlete Pro Dashboard</h1>
+    <div style={styles.page}>
+      
+      {/* HEADER */}
+      <div style={styles.header}>
+        <h1>🏈 Athlete Performance OS</h1>
+        <p style={{ opacity: 0.7 }}>
+          Train • Track • Dominate
+        </p>
+      </div>
 
-      {/* STATS DASHBOARD */}
+      {/* TOP STATS */}
       <div style={styles.grid}>
         <div style={styles.card}>
-          <h3>🔥 Status</h3>
-          <p>Elite Mode Active</p>
+          <p style={styles.label}>STATUS</p>
+          <h2>ACTIVE</h2>
         </div>
 
         <div style={styles.card}>
-          <h3>🏈 Position</h3>
-          <p>{position || "Not Selected"}</p>
+          <p style={styles.label}>POSITION</p>
+          <h2>{position || "NONE"}</h2>
         </div>
 
         <div style={styles.card}>
-          <h3>🍎 Foods Today</h3>
-          <p>{foods.length}</p>
+          <p style={styles.label}>FOOD LOG</p>
+          <h2>{foods.length}</h2>
         </div>
       </div>
 
       {/* POSITION */}
-      <div style={styles.card}>
-        <h2>🏈 Select Position</h2>
+      <div style={styles.cardWide}>
+        <h2>🏈 Position Focus</h2>
         <select
           value={position}
           onChange={(e) => setPosition(e.target.value)}
-          style={styles.input}
+          style={styles.select}
         >
-          <option value="">Choose Position</option>
+          <option value="">Select Position</option>
           {positions.map((p) => (
             <option key={p}>{p}</option>
           ))}
         </select>
 
         {position && (
-          <p>💪 Training Mode: <b>{position}</b></p>
-        )}
-      </div>
-
-      {/* FOOD TRACKER */}
-      <div style={styles.card}>
-        <h2>🍎 Nutrition Tracker</h2>
-
-        <div style={{ display: "flex", gap: 10 }}>
-          <input
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            placeholder="Enter food..."
-            style={styles.input}
-          />
-          <button onClick={addFood} style={styles.button}>Add</button>
-        </div>
-
-        <ul>
-          {foods.map((f, i) => (
-            <li key={i}>{f}</li>
-          ))}
-        </ul>
-
-        <button onClick={resetDay} style={styles.reset}>Reset Day</button>
-      </div>
-
-      {/* SCANNER UPGRADE */}
-      <div style={styles.card}>
-        <h2>📷 Food Scanner</h2>
-
-        <button
-          onClick={() => setScanning(!scanning)}
-          style={styles.button}
-        >
-          {scanning ? "Stop Scan" : "Start Scan"}
-        </button>
-
-        {scanning && (
-          <div style={{ marginTop: 10 }}>
-            <p>📸 Camera is ON (simulated)</p>
-            <p>Point camera at food...</p>
+          <div style={styles.glowBox}>
+            🔥 Training Mode: <b>{position}</b>
           </div>
         )}
       </div>
 
-      {/* TRAINING */}
-      <div style={styles.card}>
-        <h2>🏈 Training System</h2>
+      {/* FOOD */}
+      <div style={styles.cardWide}>
+        <h2>🍎 Nutrition Tracking</h2>
 
-        {position ? (
-          <p>
-            Today’s focus: <b>{position} strength & explosiveness</b>
-          </p>
-        ) : (
-          <p>Select a position to unlock training</p>
+        <div style={styles.row}>
+          <input
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            placeholder="Log food..."
+            style={styles.input}
+          />
+          <button onClick={addFood} style={styles.button}>
+            Add
+          </button>
+        </div>
+
+        <div style={styles.foodList}>
+          {foods.map((f, i) => (
+            <div key={i} style={styles.foodItem}>
+              {f}
+            </div>
+          ))}
+        </div>
+
+        <button onClick={resetDay} style={styles.danger}>
+          Reset Day
+        </button>
+      </div>
+
+      {/* SCANNER */}
+      <div style={styles.cardWide}>
+        <h2>📷 AI Scanner</h2>
+
+        <button
+          onClick={() => setScanActive(!scanActive)}
+          style={styles.button}
+        >
+          {scanActive ? "Stop Scan" : "Start Scan"}
+        </button>
+
+        {scanActive && (
+          <div style={styles.scanBox}>
+            <p>📸 Camera Active (simulated)</p>
+            <p style={{ opacity: 0.7 }}>
+              Point camera at food for analysis...
+            </p>
+          </div>
         )}
       </div>
+
     </div>
   );
 }
 
 const styles: any = {
-  container: {
+  page: {
     padding: 20,
-    fontFamily: "Arial",
-    background: "#0f0f0f",
+    background: "#0b0f14",
     color: "white",
+    fontFamily: "system-ui",
     minHeight: "100vh",
   },
+
+  header: {
+    marginBottom: 20,
+  },
+
   grid: {
     display: "grid",
     gridTemplateColumns: "repeat(3, 1fr)",
     gap: 10,
   },
+
   card: {
-    background: "#1a1a1a",
+    background: "#111823",
     padding: 15,
+    borderRadius: 12,
+    border: "1px solid #1f2a3a",
+  },
+
+  cardWide: {
+    background: "#111823",
+    padding: 15,
+    borderRadius: 12,
     marginTop: 15,
+    border: "1px solid #1f2a3a",
+  },
+
+  label: {
+    fontSize: 12,
+    opacity: 0.6,
+  },
+
+  select: {
+    width: "100%",
+    padding: 10,
+    marginTop: 10,
+  },
+
+  glowBox: {
+    marginTop: 10,
+    padding: 10,
+    background: "rgba(0,255,150,0.1)",
+    border: "1px solid rgba(0,255,150,0.3)",
     borderRadius: 10,
   },
+
+  row: {
+    display: "flex",
+    gap: 10,
+  },
+
   input: {
-    padding: 8,
-    width: "100%",
+    flex: 1,
+    padding: 10,
   },
+
   button: {
-    padding: 8,
+    padding: "10px 14px",
     cursor: "pointer",
+    background: "#2b6fff",
+    border: "none",
+    color: "white",
+    borderRadius: 8,
   },
-  reset: {
+
+  danger: {
     marginTop: 10,
-    padding: 8,
+    padding: 10,
     background: "red",
     color: "white",
     border: "none",
+    borderRadius: 8,
+  },
+
+  foodList: {
+    marginTop: 10,
+  },
+
+  foodItem: {
+    padding: 8,
+    borderBottom: "1px solid #1f2a3a",
+  },
+
+  scanBox: {
+    marginTop: 10,
+    padding: 15,
+    border: "1px dashed #2b6fff",
+    borderRadius: 10,
   },
 };
