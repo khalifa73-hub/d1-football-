@@ -103,7 +103,6 @@ export default function Progress() {
             <div className="absolute left-3 top-0 bottom-0 w-px bg-white/[0.06]" />
             <div className="space-y-3 pl-8">
               {entries?.map((entry) => {
-                // Check local or backward compatible metric tags seamlessly
                 const m = METRICS.find(mx => mx.value === entry.metric) || 
                           (entry.metric === "benchPress" ? METRICS.find(mx => mx.value === "smithMachineBench") : null);
                 return (
