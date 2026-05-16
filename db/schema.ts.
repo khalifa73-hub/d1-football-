@@ -1,0 +1,26 @@
+```typescript
+import { pgTable, serial, text, integer, timestamp, doublePrecision } from "drizzle-orm/pg-core";
+
+// This table handles all your Food Scans and Meal Logs
+export const mealsTable = pgTable("meals", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull(),
+  calories: integer("calories"),
+  protein: integer("protein"),
+  carbs: integer("carbs"),
+  fat: integer("fat"),
+  athleteFeedback: text("athlete_feedback"),
+  loggedAt: timestamp("logged_at").defaultNow().notNull(),
+});
+
+// This table handles your Smith Machine Bench, 40-Yard Dash, and Body Weight
+export const progressEntriesTable = pgTable("progress_entries", {
+  id: serial("id").primaryKey(),
+  metric: text("metric").notNull(), // e.g., 'smithMachineBench', 'fortyYardDash'
+  value: text("value").notNull(),  // We store as text to handle decimals or times
+  unit: text("unit"),              // lbs, sec, in
+  notes: text("notes"),
+  loggedAt: timestamp("logged_at").defaultNow().notNull(),
+});
+
+```
