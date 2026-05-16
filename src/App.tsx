@@ -1,100 +1,54 @@
-import { Switch, Route } from "wouter";
-import { useLocation } from "wouter";
+import { Switch, Route, Router as WouterRouter } from "wouter";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { Toaster } from "@/components/ui/toaster";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import NotFound from "@/pages/not-found";
+import { SidebarLayout } from "@/components/layout/sidebar-layout";
 
-function Sidebar() {
-  const [location, setLocation] = useLocation();
+import Dashboard from "@/pages/dashboard";
+import Workouts from "@/pages/workouts";
+import Nutrition from "@/pages/nutrition";
+import Progress from "@/pages/progress";
+import Coach from "@/pages/coach";
+import Recruiting from "@/pages/recruiting";
+import Recovery from "@/pages/recovery";
+import Film from "@/pages/film";
+import More from "@/pages/more";
 
-  const links = [
-    ["Dashboard", "/"],
-    ["Workouts", "/workouts"],
-    ["Nutrition", "/nutrition"],
-    ["Progress", "/progress"],
-    ["Coach", "/coach"],
-  ];
+const queryClient = new QueryClient();
 
+document.documentElement.classList.add("dark");
+
+function Router() {
   return (
-    <div style={styles.sidebar}>
-      <h2 style={{ marginBottom: 20 }}>🏈 D1 App</h2>
-
-      {links.map(([name, path]) => (
-        <div
-          key={path}
-          onClick={() => setLocation(path)}
-          style={{
-            ...styles.link,
-            background: location === path ? "#1f2937" : "transparent",
-          }}
-        >
-          {name}
-        </div>
-      ))}
-    </div>
+    <SidebarLayout>
+      <Switch>
+        <Route path="/" component={Dashboard} />
+        <Route path="/workouts" component={Workouts} />
+        <Route path="/nutrition" component={Nutrition} />
+        <Route path="/progress" component={Progress} />
+        <Route path="/coach" component={Coach} />
+        <Route path="/recruiting" component={Recruiting} />
+        <Route path="/recovery" component={Recovery} />
+        <Route path="/film" component={Film} />
+        <Route path="/more" component={More} />
+        <Route component={NotFound} />
+      </Switch>
+    </SidebarLayout>
   );
 }
 
-/* PAGES (simple placeholders for now) */
-function Dashboard() {
-  return <div style={styles.page}>📊 Dashboard</div>;
-}
-function Workouts() {
-  return <div style={styles.page}>💪 Workouts</div>;
-}
-function Nutrition() {
-  return <div style={styles.page}>🍎 Nutrition</div>;
-}
-function Progress() {
-  return <div style={styles.page}>📈 Progress</div>;
-}
-function Coach() {
-  return <div style={styles.page}>🧠 Coach</div>;
-}
-
-export default function App() {
+function App() {
   return (
-    <div style={styles.container}>
-      <Sidebar />
-
-      <div style={styles.content}>
-        <Switch>
-          <Route path="/" component={Dashboard} />
-          <Route path="/workouts" component={Workouts} />
-          <Route path="/nutrition" component={Nutrition} />
-          <Route path="/progress" component={Progress} />
-          <Route path="/coach" component={Coach} />
-        </Switch>
-      </div>
-    </div>
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
+          <Router />
+        </WouterRouter>
+        <Toaster />
+      </TooltipProvider>
+    </QueryClientProvider>
   );
 }
 
-const styles: any = {
-  container: {
-    display: "flex",
-    minHeight: "100vh",
-    background: "#0b0c10",
-    color: "white",
-    fontFamily: "system-ui",
-  },
-
-  sidebar: {
-    width: 220,
-    padding: 20,
-    background: "#111827",
-  },
-
-  link: {
-    padding: 10,
-    borderRadius: 8,
-    cursor: "pointer",
-    marginBottom: 8,
-  },
-
-  content: {
-    flex: 1,
-    padding: 20,
-  },
-
-  page: {
-    fontSize: 22,
-  },
-};
+export default App;
