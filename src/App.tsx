@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+useEffect, useState } from "react";
 
 const positions = ["QB","RB","WR","TE","OL","DL","DE","LB","CB","S"];
 
