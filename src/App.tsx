@@ -1,24 +1,13 @@
 import { useEffect, useState } from "react";
 
-const positions = [
-  "QB",
-  "RB",
-  "WR",
-  "TE",
-  "OL",
-  "DL",
-  "DE",
-  "LB",
-  "CB",
-  "S",
-];
+const positions = ["QB","RB","WR","TE","OL","DL","DE","LB","CB","S"];
 
 export default function App() {
   const [position, setPosition] = useState("");
   const [foods, setFoods] = useState<string[]>([]);
   const [input, setInput] = useState("");
+  const [scanning, setScanning] = useState(false);
 
-  // 🔁 daily reset
   useEffect(() => {
     const last = localStorage.getItem("lastReset");
     const today = new Date().toDateString();
@@ -40,7 +29,7 @@ export default function App() {
     setInput("");
   }
 
-  function resetFood() {
+  function resetDay() {
     setFoods([]);
     localStorage.setItem("foods", JSON.stringify([]));
     localStorage.setItem("lastReset", new Date().toDateString());
@@ -48,38 +37,48 @@ export default function App() {
 
   return (
     <div style={styles.container}>
-      <h1>🏈 D1 Athlete Dashboard</h1>
+      <h1>🏈 D1 Athlete Pro Dashboard</h1>
 
-      {/* DASHBOARD */}
-      <div style={styles.card}>
-        <h2>📊 Dashboard</h2>
-        <p>Welcome athlete. Track everything here.</p>
+      {/* STATS DASHBOARD */}
+      <div style={styles.grid}>
+        <div style={styles.card}>
+          <h3>🔥 Status</h3>
+          <p>Elite Mode Active</p>
+        </div>
+
+        <div style={styles.card}>
+          <h3>🏈 Position</h3>
+          <p>{position || "Not Selected"}</p>
+        </div>
+
+        <div style={styles.card}>
+          <h3>🍎 Foods Today</h3>
+          <p>{foods.length}</p>
+        </div>
       </div>
 
-      {/* POSITIONS */}
+      {/* POSITION */}
       <div style={styles.card}>
-        <h2>🏈 Football Position</h2>
+        <h2>🏈 Select Position</h2>
         <select
           value={position}
           onChange={(e) => setPosition(e.target.value)}
           style={styles.input}
         >
-          <option value="">Select Position</option>
+          <option value="">Choose Position</option>
           {positions.map((p) => (
             <option key={p}>{p}</option>
           ))}
         </select>
 
         {position && (
-          <p style={{ marginTop: 10 }}>
-            🔥 Training Mode: <b>{position}</b>
-          </p>
+          <p>💪 Training Mode: <b>{position}</b></p>
         )}
       </div>
 
       {/* FOOD TRACKER */}
       <div style={styles.card}>
-        <h2>🍎 Food Tracker (Daily Reset)</h2>
+        <h2>🍎 Nutrition Tracker</h2>
 
         <div style={{ display: "flex", gap: 10 }}>
           <input
@@ -88,9 +87,7 @@ export default function App() {
             placeholder="Enter food..."
             style={styles.input}
           />
-          <button onClick={addFood} style={styles.button}>
-            Add
-          </button>
+          <button onClick={addFood} style={styles.button}>Add</button>
         </div>
 
         <ul>
@@ -99,15 +96,39 @@ export default function App() {
           ))}
         </ul>
 
-        <button onClick={resetFood} style={styles.reset}>
-          Reset Day
-        </button>
+        <button onClick={resetDay} style={styles.reset}>Reset Day</button>
       </div>
 
-      {/* SCANNER */}
+      {/* SCANNER UPGRADE */}
       <div style={styles.card}>
-        <h2>📷 Scanner</h2>
-        <p>Camera + barcode scanner coming next update.</p>
+        <h2>📷 Food Scanner</h2>
+
+        <button
+          onClick={() => setScanning(!scanning)}
+          style={styles.button}
+        >
+          {scanning ? "Stop Scan" : "Start Scan"}
+        </button>
+
+        {scanning && (
+          <div style={{ marginTop: 10 }}>
+            <p>📸 Camera is ON (simulated)</p>
+            <p>Point camera at food...</p>
+          </div>
+        )}
+      </div>
+
+      {/* TRAINING */}
+      <div style={styles.card}>
+        <h2>🏈 Training System</h2>
+
+        {position ? (
+          <p>
+            Today’s focus: <b>{position} strength & explosiveness</b>
+          </p>
+        ) : (
+          <p>Select a position to unlock training</p>
+        )}
       </div>
     </div>
   );
@@ -121,6 +142,11 @@ const styles: any = {
     color: "white",
     minHeight: "100vh",
   },
+  grid: {
+    display: "grid",
+    gridTemplateColumns: "repeat(3, 1fr)",
+    gap: 10,
+  },
   card: {
     background: "#1a1a1a",
     padding: 15,
@@ -130,7 +156,6 @@ const styles: any = {
   input: {
     padding: 8,
     width: "100%",
-    marginTop: 5,
   },
   button: {
     padding: 8,
