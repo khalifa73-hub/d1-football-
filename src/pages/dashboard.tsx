@@ -1,7 +1,9 @@
+import { useState } from "react";
 import { useGetAthleteStats, useGetTodayWorkout, useGetNutritionSummary, useGetAthleteProfile } from "@workspace/api-client-react";
-import { Activity, Flame, Zap, Trophy } from "lucide-react";
+import { Activity, Flame, Zap, Trophy, MapPin } from "lucide-react";
 import { Link } from "wouter";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 function GlassCard({ children, className = "", accent = false }: { children: React.ReactNode; className?: string; accent?: boolean }) {
   return (
@@ -28,36 +30,67 @@ export default function Dashboard() {
   const { data: nutrition, isLoading: nutritionLoading } = useGetNutritionSummary();
   const { data: profile } = useGetAthleteProfile();
 
+  // Gym selection state
+  const [selectedGym, setSelectedGym] = useState("planet-fitness");
+
   const calPct = Math.min(100, ((nutrition?.totalCalories ?? 0) / (nutrition?.calorieGoal ?? 4000)) * 100);
   const proteinPct = Math.min(100, ((nutrition?.totalProtein ?? 0) / (nutrition?.proteinGoal ?? 200)) * 100);
 
   return (
     <div className="space-y-5">
       {/* Hero header */}
-      <div className="pt-2">
-        <div className="section-label">Performance Overview</div>
-        <h1 className="text-3xl font-black uppercase tracking-tight text-white" style={{ letterSpacing: "-0.04em" }}>
-          {profile?.name ? profile.name.split(" ")[0] : "Athlete"}
-        </h1>
-        {(profile?.position || profile?.school) && (
-          <div className="flex gap-2 mt-2 flex-wrap">
-            {profile.position && (
-              <span className="text-[10px] font-bold tracking-[0.1em] uppercase px-2 py-0.5 border"
-                style={{ color: "#f87171", borderColor: "rgba(239,68,68,0.3)", background: "rgba(239,68,68,0.08)" }}>
-                {profile.position}
-              </span>
-            )}
-            {profile.school && (
-              <span className="text-[10px] font-bold tracking-[0.1em] uppercase px-2 py-0.5 border"
-                style={{ color: "#c4b5fd", borderColor: "rgba(139,92,246,0.3)", background: "rgba(139,92,246,0.08)" }}>
-                {profile.school}
-              </span>
-            )}
-          </div>
-        )}
+      <div className="pt-2 flex justify-between items-start">
+        <div>
+          <div className="section-label">Performance Overview</div>
+          <h1 className="text-3xl font-black uppercase tracking-tight text-white" style={{ letterSpacing: "-0.04em" }}>
+            {profile?.name ? profile.name.split(" ")[0] : "Athlete"}
+          </h1>
+          {(profile?.position || profile?.school) && (
+            <div className="flex gap-2 mt-2 flex-wrap">
+              {profile.position && (
+                <span className="text-[10px] font-bold tracking-[0.1em] uppercase px-2 py-0.5 border"
+                  style={{ color: "#f87171", borderColor: "rgba(239,68,68,0.3)", background: "rgba(239,68,68,0.08)" }}>
+                  {profile.position}
+                </span>
+              )}
+              {profile.school && (
+                <span className="text-[10px] font-bold tracking-[0.1em] uppercase px-2 py-0.5 border"
+                  style={{ color: "#c4b5fd", borderColor: "rgba(139,92,246,0.3)", background: "rgba(139,92,246,0.08)" }}>
+                  {profile.school}
+                </span>
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* Dynamic Gym Equipment Selector */}
+        <div className="w-40">
+          <label className="text-[9px] uppercase tracking-[0.15em] font-bold text-white/30 block mb-1 flex items-center gap-1">
+            <MapPin className="h-2.5 w-2.5 text-[#ef4444]" /> Gym Setup
+          </label>
+          <Select value={selectedGym} onValueChange={setSelectedGym}>
+            <SelectTrigger className="bg-white/5 border-white/10 text-xs font-bold uppercase tracking-wider text-white h-8 rounded-none">
+              <SelectValue placeholder="Select Gym" />
+            </SelectTrigger>
+            <SelectContent className="bg-[#111] border-white/10 rounded-none">
+              <SelectItem value="planet-fitness" className="text-xs uppercase font-bold tracking-wider">Planet Fitness</SelectItem>
+              <SelectItem value="gold-gym" className="text-xs uppercase font-bold tracking-wider">Barbell/Gold's Gym</SelectItem>
+              <SelectItem value="home-gym" className="text-xs uppercase font-bold tracking-wider">Dumbbell Only</SelectItem>
+              <SelectItem value="calisthenics" className="text-xs uppercase font-bold tracking-wider">Bodyweight/No Gear</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
       </div>
 
-      {/* Performance scores */}
+      {/* Gym Equipment Status Note */}
+      <div className="p-3 bg-white/[0.02] border border-white/5 text-[11px] font-medium text-white/50 tracking-wide">
+        {selectedGym === "planet-fitness" && "⚠️ AI Coach Mode: Protocols optimized for Smith Machines, Cables, and Dumbbells up to 75lbs (No free barbells)."}
+        {selectedGym === "gold-gym" && "⚡ AI Coach Mode: Full access enabled. Heavy barbell complexes and free racks included."}
+        {selectedGym === "home-gym" && "🏡 AI Coach Mode: Limited gear. Workouts structured around standard dumbbell variations."}
+        {selectedGym === "calisthenics" && "🏃 AI Coach Mode: Zero gear required. High-intensity bodyweight explosion protocols active."}
+      </div>
+
+      {/* Athlete scores */}
       <div>
         <div className="section-label">Athlete Scores</div>
         {statsLoading ? (
@@ -71,7 +104,6 @@ export default function Dashboard() {
             <StatBig label="Speed" value={stats?.speedScore ?? 0} color="#06b6d4" />
           </div>
         )}
-        {/* Bar row */}
         {!statsLoading && (
           <div className="grid grid-cols-3 gap-2 mt-1">
             {[
@@ -97,9 +129,17 @@ export default function Dashboard() {
             <div className="flex items-start justify-between gap-3">
               <div className="flex-1">
                 <div className="text-[9px] uppercase tracking-[0.15em] font-bold mb-1.5" style={{ color: "#ef4444" }}>{todayWorkout.category}</div>
-                <div className="text-lg font-black uppercase text-white" style={{ letterSpacing: "-0.02em" }}>{todayWorkout.title}</div>
+                <div className="text-lg font-black uppercase text-white" style={{ letterSpacing: "-0.02em" }}>
+                  {selectedGym === "planet-fitness" && todayWorkout.title.includes("Barbell") 
+                    ? todayWorkout.title.replace("Barbell", "Smith Machine") 
+                    : todayWorkout.title}
+                </div>
                 {todayWorkout.description && (
-                  <div className="text-xs mt-1" style={{ color: "rgba(255,255,255,0.4)" }}>{todayWorkout.description}</div>
+                  <div className="text-xs mt-1" style={{ color: "rgba(255,255,255,0.4)" }}>
+                    {selectedGym === "planet-fitness" 
+                      ? "Modified for Planet Fitness equipment rules. Focus on high tension control." 
+                      : todayWorkout.description}
+                  </div>
                 )}
               </div>
               {todayWorkout.completed && (
